@@ -2,7 +2,7 @@
 # 3W TOOLKIT — UNLABELED DATA
 # ============================================================================
 
-from dataset import (
+from unlabeled_dataset import (
     UnlabeledParquetDatasetConfig,
     UnlabeledParquetDataset,
 )

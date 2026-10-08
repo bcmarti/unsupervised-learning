@@ -2,6 +2,8 @@ uv.lock
 
 __pycache__/
 
+src/unsupervised_learning.egg-info/
+
 # Environments
 .env
 .venv
