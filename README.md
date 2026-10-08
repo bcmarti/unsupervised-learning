@@ -1,94 +1,59 @@
 # unsupervised-learning
 
-This project sets up a **reproducible Conda environment** for running unsupervised learning experiments using:
+## Introduction
 
-* **MOMENT** (time-series foundation model)
-* **3W Toolkit** (Petrobras 3W dataset utilities)
+This project sets up a Python environment for conducting unsupervised learning experiments using:
 
-The setup is intentionally strict: **Conda manages all dependencies**, while **pip is used only to install project code** (without pulling dependencies).
+* **MOMENT** (a time-series foundation model)
+* **3W Toolkit** (utilities for the Petrobras 3W dataset)
 
----
+The main goal is to fine-tune MOMENT using unlabeled data similar to the **3W Dataset** for signal reconstruction. The underlying assumption is that when the model encounters anomalous data, its reconstruction will deviate from the actual signal, indicating a possible failure.
+
+The model will be validated and tested using the labeled **3W Dataset**.
 
 ## Prerequisites
 
-Before starting, make sure you have:
+Before getting started, make sure that **uv** is installed by following the [official installation instructions](https://docs.astral.sh/uv/getting-started/installation/).
 
-* **Conda installed** (Miniconda or Anaconda)
-* **Git installed**
-* A Linux or macOS environment (tested on Linux)
-
-You can verify Conda with:
-
-```bash
-conda --version
-```
-
----
-
-## Repository layout
-
-The `3W` repository **must be cloned one directory above** this project.
-
-### Example directory structure
-
-```
-projects/
-├── 3W/
-│   └── (ThreeWToolkit source code)
-│
-├── 3W-unsupervised-learning/
-│   ├── environment.yml
-│   ├── setup.sh
-│   └── README.md
-```
-
-### Clone repositories
-
-```bash
-cd projects
-
-git clone --branch v.1.81.0 --single-branch https://github.com/petrobras/3W.git
-
-git clone <THIS_REPOSITORY_URL>
-```
-
----
+**uv** will be used to manage the Python virtual environment and dependencies, ensuring a reproducible development environment.
 
 ## Environment setup
 
-The entire setup is automated via `setup.sh`.
+Open a prompt window in this repository folder and run the following commands according to your operating system:
 
-### What the script does
-
-1. Creates the Conda environment from `environment.yml`
-2. Activates the environment
-3. Installs project code (`3W` and `momentfm`) using `pip --no-deps`
-
-### Run setup
-
-From inside `3W-unsupervised-learning`:
+- ### Linux / macOS (terminal):
 
 ```bash
-bash setup.sh
+uv venv .venv
+source .venv/bin/activate
 ```
 
-This will create and configure the Conda environment named:
-
-```
-3W-unsupervised
-```
-
----
-
-## Activating the environment
-
-After installation:
+- ### Windows (cmd):
 
 ```bash
-conda activate 3W-unsupervised
+uv venv .venv
+.venv\Scripts\activate.bat
 ```
 
----
+- ### Windows (PowerShell):
+
+```bash
+uv venv .venv
+.venv\Scripts\Activate.ps1
+``` 
+
+- ### Windows (Bash):
+
+```bash
+uv venv .venv
+source .venv/Scripts/activate
+```
+
+Now, use this command to setup the virtual environment with the dependencies specified in the [pyproject.toml](pyproject.toml):
+
+```bash
+uv sync --all-extras
+```
 
 ## Verifying the installation
 
@@ -96,36 +61,22 @@ You can quickly test that everything is working:
 
 ```bash
 python - << 'EOF'
-import torch
 import momentfm
 import ThreeWToolkit
+from importlib.metadata import version
 
 print("Setup successful")
-print("Torch version:", torch.__version__)
-print("CUDA available:", torch.cuda.is_available())
+print("MOMENT version:", version('momentfm'))
+print("3W Toolkit version:", ThreeWToolkit.__version__)
 EOF
 ```
 
----
-
-## Notes
-
-* **Do not install project dependencies with pip**
-* All numerical, CUDA, and ML dependencies are managed by **Conda**
-* Pip is used strictly to install source code
-* This avoids dependency conflicts (e.g., NumPy, CUDA, PyTorch)
-
----
-
 ## Troubleshooting
 
-If you encounter `ModuleNotFoundError`:
-
-* Add the missing package to `environment.yml`
-* Update the environment using:
+If you encounter `ModuleNotFoundError` or need to install an additional package in the virtual environment, use the following command:
 
 ```bash
-conda env update -f environment.yml
+uv add <package>
 ```
 
----
+This will add the package to the project's dependencies and update the environment accordingly.
