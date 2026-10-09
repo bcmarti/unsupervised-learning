@@ -71,6 +71,16 @@ print("3W Toolkit version:", ThreeWToolkit.__version__)
 EOF
 ```
 
+## Downloading the 3W Dataset
+
+To download the **3W Dataset 2.0.0**, open a new prompt window in this repository folder and activate the virtual environment. Then run the script:
+
+```bash
+python utils/dataset_download.py
+```
+
+The dataset will be downloaded in `dataset` folder.
+
 ## Troubleshooting
 
 If you encounter `ModuleNotFoundError` or need to install an additional package in the virtual environment, use the following command:
