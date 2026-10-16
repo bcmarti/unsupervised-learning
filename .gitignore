@@ -6,6 +6,8 @@ src/unsupervised_learning.egg-info/
 
 dataset/
 
+histograms/
+
 # Environments
 .env
 .venv
@@ -15,6 +17,6 @@ ENV/
 env.bak/
 venv.bak/
 
-# Local markdown files (used for to do lists and other personal documents)
+# Local files (used for to do lists and other personal documents)
 
 .local_docs/
