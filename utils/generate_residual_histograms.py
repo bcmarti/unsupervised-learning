@@ -8,8 +8,16 @@ from histogram.residual_histograms import ResidualHistograms
 
 
 # Configuration
-NPZ_PATH = Path("Path/To/File.npz")
-OUTPUT_DIR = Path("histograms") / NPZ_PATH.stem
+NPZ_PATH = Path("Path/to/.npz")
+log_scale = False
+
+BASE_OUTPUT_DIR = Path("histograms") / NPZ_PATH.stem
+
+OUTPUT_DIR = (
+    BASE_OUTPUT_DIR.with_name(f"{BASE_OUTPUT_DIR.name}_log")
+    if log_scale
+    else BASE_OUTPUT_DIR
+)
 
 SIGNAL_NAMES = [
     "ESTADO-DHSV",
@@ -27,7 +35,6 @@ SIGNAL_NAMES = [
     "T-JUS-CKP",
     "T-TPT",
 ]
-
 
 def main():
     """Load predictions, reorganize arrays, and generate histograms."""
@@ -63,16 +70,19 @@ def main():
 
     # Generate and save one histogram per signal.
     analyzer.plot_all(
-        bins=50,
+        bins=101,
+        figsize=(12, 6),
         show=False,
         save_path=OUTPUT_DIR,
+        log_scale=log_scale,
+        x_percentile=100,
     )
 
     # Save descriptive statistics for all signals.
     statistics = analyzer.all_statistics()
     statistics.to_csv(OUTPUT_DIR / "residual_statistics.csv")
 
-    print(f"\nGenerated residual histograms.")
+    print(f"\nGenerated residual histograms.")    
     print(f"Output directory: {OUTPUT_DIR.resolve()}")
     print(f"Statistics saved to: {OUTPUT_DIR / 'residual_statistics.csv'}")
 
