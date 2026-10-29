@@ -1,4 +1,4 @@
-"""Generate residual histograms from an NPZ file."""
+"""Generate residual histograms from a single NPZ file."""
 
 from pathlib import Path
 
@@ -9,13 +9,21 @@ from histogram.residual_histograms import ResidualHistograms
 
 # Configuration
 NPZ_PATH = Path("Path/to/.npz")
-log_scale = False
+
+LOG_SCALE = False
+NORMALIZE = False
+FONT_SIZE = 12
+
+BINS = 101
+FIGSIZE = (12, 6)
+X_PERCENTILE = 100
+X_RANGE = None  # Example: (-3, 3)
 
 BASE_OUTPUT_DIR = Path("histograms") / NPZ_PATH.stem
 
 OUTPUT_DIR = (
     BASE_OUTPUT_DIR.with_name(f"{BASE_OUTPUT_DIR.name}_log")
-    if log_scale
+    if LOG_SCALE
     else BASE_OUTPUT_DIR
 )
 
@@ -41,10 +49,18 @@ def main():
     if not NPZ_PATH.is_file():
         raise FileNotFoundError(f"NPZ file not found: {NPZ_PATH}")
 
+    if not 0 < X_PERCENTILE <= 100:
+        raise ValueError("X_PERCENTILE must be in the interval (0, 100].")
+
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     # Load the arrays from the NPZ file.
     with np.load(NPZ_PATH, allow_pickle=False) as data:
+        if not {"y_pred", "y_true"}.issubset(data.files):
+            raise ValueError(
+                f"{NPZ_PATH} must contain 'y_pred' and 'y_true'."
+            )
+
         y_pred = data["y_pred"]
         y_true = data["y_true"]
 
@@ -70,21 +86,24 @@ def main():
 
     # Generate and save one histogram per signal.
     analyzer.plot_all(
-        bins=101,
-        figsize=(12, 6),
+        bins=BINS,
+        figsize=FIGSIZE,
         show=False,
         save_path=OUTPUT_DIR,
-        log_scale=log_scale,
-        x_percentile=100,
+        log_scale=LOG_SCALE,
+        x_percentile=X_PERCENTILE,
+        font_size=FONT_SIZE,
+        normalize=NORMALIZE,
+        x_range=X_RANGE,
     )
 
     # Save descriptive statistics for all signals.
-    statistics = analyzer.all_statistics()
-    statistics.to_csv(OUTPUT_DIR / "residual_statistics.csv")
+    statistics_path = OUTPUT_DIR / "residual_statistics.csv"
+    analyzer.all_statistics().to_csv(statistics_path)
 
-    print(f"\nGenerated residual histograms.")    
+    print("\nGenerated residual histograms.")
     print(f"Output directory: {OUTPUT_DIR.resolve()}")
-    print(f"Statistics saved to: {OUTPUT_DIR / 'residual_statistics.csv'}")
+    print(f"Statistics saved to: {statistics_path.resolve()}")
 
 
 if __name__ == "__main__":
