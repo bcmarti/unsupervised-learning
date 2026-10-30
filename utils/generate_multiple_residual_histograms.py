@@ -130,40 +130,67 @@ def calculate_shared_x_ranges():
 
 
 def calculate_shared_y_ranges(shared_x_ranges):
-    """Calculate one y-axis range per signal across all files."""
-    shared_maxima = {
-        signal: 0.0
-        for signal in SIGNAL_NAMES
-    }
+    """Calculate shared y-axis ranges per signal across all files."""
+    shared_maxima = {signal: 0.0 for signal in SIGNAL_NAMES}
+    shared_minima = {signal: np.inf for signal in SIGNAL_NAMES}
 
     for npz_path in NPZ_PATHS:
         analyzer = load_analyzer(npz_path)
 
         for signal in SIGNAL_NAMES:
-            _, y_max = analyzer._get_default_y_range(
-                signal=signal,
-                bins=BINS,
-                x_range=shared_x_ranges[signal],
-                normalize=NORMALIZE,
+            residuals = analyzer.get_signal_residuals(signal)
+
+            bin_edges = np.linspace(
+                *shared_x_ranges[signal],
+                BINS + 1,
             )
 
-            shared_maxima[signal] = max(
-                shared_maxima[signal],
-                y_max,
+            weights = (
+                np.full(residuals.size, 1.0 / residuals.size)
+                if NORMALIZE and residuals.size > 0
+                else None
             )
+
+            frequencies, _ = np.histogram(
+                residuals,
+                bins=bin_edges,
+                weights=weights,
+            )
+
+            positive_frequencies = frequencies[frequencies > 0]
+
+            if positive_frequencies.size:
+                shared_maxima[signal] = max(
+                    shared_maxima[signal],
+                    float(positive_frequencies.max()),
+                )
+
+                shared_minima[signal] = min(
+                    shared_minima[signal],
+                    float(positive_frequencies.min()),
+                )
 
         print(f"Calculated y-axis limits: {npz_path}")
-
         del analyzer
 
-    return {
-        signal: (
-            (0.0, 1.0)
-            if NORMALIZE
-            else (0.0, y_max if y_max > 0 else 1.0)
-        )
-        for signal, y_max in shared_maxima.items()
-    }
+    shared_ranges = {}
+
+    for signal in SIGNAL_NAMES:
+        y_max = 1.0 if NORMALIZE else shared_maxima[signal]
+        y_min = shared_minima[signal]
+
+        if y_max <= 0 or not np.isfinite(y_max):
+            y_max = 1.0
+
+        if not np.isfinite(y_min):
+            y_min = y_max
+
+        if not LOG_SCALE:
+            y_min = 0.0
+
+        shared_ranges[signal] = (y_min, y_max)
+
+    return shared_ranges
 
 
 def main():
