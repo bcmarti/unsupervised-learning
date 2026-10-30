@@ -264,10 +264,7 @@ class ResidualHistograms:
         )
 
         if y_range is not None:
-            if log_scale:
-                ax.set_ylim(top=y_range[1])
-            else:
-                ax.set_ylim(*y_range)
+            ax.set_ylim(*y_range)
 
         ax.axvline(
             0,
