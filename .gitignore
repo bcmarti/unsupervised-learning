@@ -6,6 +6,8 @@ src/unsupervised_learning.egg-info/
 
 dataset/
 
+unlabeled_dataset_without_3w/
+
 histograms/
 
 # Environments
