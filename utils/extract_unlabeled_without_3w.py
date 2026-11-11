@@ -382,8 +382,8 @@ class UnlabeledDataExtractor:
 
 if __name__ == "__main__":
 
-    # run with 'python utils/extract_unlabeled_without_3w.py 2>&1 | tee extraction.log'
-    
+    # run with 'python utils/extract_unlabeled_without_3w.py 2>&1 | tee logs/extraction.log'
+
     extractor = UnlabeledDataExtractor(
         unlabeled_dir="/home/bruno.martins/dataset",
         dataset_3w_dir="dataset",
