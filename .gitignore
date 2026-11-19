@@ -10,6 +10,8 @@ unlabeled_dataset_without_3w/
 
 histograms/
 
+vector_histograms/
+
 # Environments
 .env
 .venv
