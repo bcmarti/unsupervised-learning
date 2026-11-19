@@ -28,9 +28,9 @@ USE_STANDARD_SCALER = True
 # Independently normalize each real/predicted N-dimensional vector by its L2 norm.
 NORMALIZE_VECTORS = False
 
-LOG_SCALE = True
+LOG_SCALE = False
 NORMALIZE_HISTOGRAM = True
-FONT_SIZE = 12
+FONT_SIZE = 18
 
 BINS = 100
 FIGSIZE = (12, 6)
